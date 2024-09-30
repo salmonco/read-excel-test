@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
+import SaveToPdf from "./SaveToPdf";
 
 export default function ExcelReaderPage() {
   const [data, setData] = useState<
     { storeName: string; description: string }[]
   >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -23,6 +25,7 @@ export default function ExcelReaderPage() {
         }>(worksheet);
         console.log(jsonData);
         setData(jsonData);
+        setIsLoading(false);
       };
       reader.readAsBinaryString(file);
     }
@@ -32,23 +35,25 @@ export default function ExcelReaderPage() {
     <div>
       <h1>엑셀 파일 업로드</h1>
       <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
-      <h2>데이터</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Store Name</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr key={index}>
-              <td>{item.storeName}</td>
-              <td>{item.description}</td>
+      <SaveToPdf filename="analysis_result1.pdf" isLoading={isLoading}>
+        <h2>데이터</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Store Name</th>
+              <th>Description</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={index}>
+                <td>{item.storeName}</td>
+                <td>{item.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </SaveToPdf>
     </div>
   );
 }
